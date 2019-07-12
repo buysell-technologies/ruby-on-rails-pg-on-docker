@@ -1,5 +1,7 @@
 # Ruby on Rails on Docker
-
+## Model diagram
+ - ![モデル図](/images/modelpic.jpg)
+ 
 ## Ruby version
  - [.ruby-version](https://github.com/hihats/ruby-on-rails-pg-on-docker/blob/master/.ruby-version)
 
