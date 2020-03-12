@@ -13,7 +13,7 @@ class TasksController < ApplicationController
 
   def create
     task = Task.create(task_params)
-    redirect_to task, notice: "タスク「#{task.title}」を更新しました。"
+    redirect_to task, notice: "タスク「#{task.title}」を登録しました。"
   end
 
   def edit
