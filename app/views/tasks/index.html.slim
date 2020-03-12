@@ -1,22 +1,14 @@
-DOCTYPE
-html
-  head
-    title タスク一覧
+h1 タスク一覧
+= link_to '新規登録', new_task_path, class: 'btn btn-primary'
 
-  body
-
-    header#header
-      h1 タスク一覧
-    .card
-      .title
-        p = link_to "タスク名", "show_task_path"
-      .important
-        p 重要
-      .deadline_date
-        p あと3日
-
-      = link_to '変更', new_task_path, class: 'btn btn-default'
-
-      = link_to '削除', new_task_path, class: 'btn btn-default'
-
-    = link_to '新規登録', new_task_path, class: 'btn btn-primary'
+.mb-3
+table.table.table-hover
+  thead.thead-default
+    tr
+      th= Task.human_attribute_name(:title)
+      th= Task.human_attribute_name(:created_at)
+    tboby
+      - @tasks.each do |task|
+        tr
+          td= task.title
+          td= task.created_at
