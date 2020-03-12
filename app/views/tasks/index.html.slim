@@ -10,5 +10,5 @@ table.table.table-hover
     tboby
       - @tasks.each do |task|
         tr
-          td= task.title
+          td= link_to task.title, task
           td= task.created_at
