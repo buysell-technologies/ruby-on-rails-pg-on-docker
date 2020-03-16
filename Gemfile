@@ -40,6 +40,7 @@ group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'html2slim'
   gem 'rspec-rails'
+  gem 'factory_bot_rails'
 end
 
 group :development do
@@ -52,8 +53,8 @@ group :development do
 end
 
 group :test do
-  gem 'selenium-webdriver'
   gem 'capybara'
+  gem 'webdrivers'
 end
 
 
