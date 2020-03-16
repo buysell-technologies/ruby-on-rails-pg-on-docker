@@ -1,8 +1,8 @@
-class ChangeTasksTitleLimit20 < ActiveRecord::Migration[5.2]
+class ChangeTasksTitleLimit30 < ActiveRecord::Migration[5.2]
   def up
-    change_column :tasks, :name, :string, limit: 30
+    change_column :tasks, :title, :string, limit: 30
   end
   def down
-    change_column :tasks, :name, :string
+    change_column :tasks, :title, :string
   end
 end
