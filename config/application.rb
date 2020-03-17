@@ -40,5 +40,13 @@ module App
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+
+    config.generators do |g|
+      # Railsジェネレータがfactory_bot用のファイルを生成するのを無効化
+      g.factory_bot false
+
+      # ファクトリファイルの置き場を変更
+      g.fixture_replacement :factory_bot, dir: 'spec/factories'
+    end
   end
 end
