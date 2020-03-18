@@ -1,4 +1,23 @@
-h1
-  | Tasks#show
-p
-  | Find me in app/views/tasks/show.html.erb
+h1 タスク詳細
+
+.nav.justify-content-end
+  = link_to '一覧', tasks_path, class: `nav_link`
+table.table.table-hover
+  tboby
+      tr
+        th= Task.human_attribute_name(:id)
+        td= @task.id
+      tr
+        th= Task.human_attribute_name(:title)
+        td= @task.title
+      tr
+        th= Task.human_attribute_name(:desciption)
+        td= simple_format(h(@task.description), {}, sanitize: false,wrapper_tag: "div")
+      tr
+        th= Task.human_attribute_name(:create_at)
+        td= @task.created_at
+      tr
+        th= Task.human_attribute_name(:updated_at)
+        td= @task.updated_at
+
+= link_to '編集', edit_task_path, class: 'btn btn-primary mr-3'

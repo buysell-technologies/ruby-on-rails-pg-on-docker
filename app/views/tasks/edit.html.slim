@@ -1,4 +1,6 @@
-h1
-  | Tasks#edit
-p
-  | Find me in app/views/tasks/edit.html.erb
+h1 タスクの編集
+
+.nav.justify-content-end
+  = link_to '一覧', tasks_path, class: `nav_link`
+
+= render partial: 'form', locals: { task: @task }

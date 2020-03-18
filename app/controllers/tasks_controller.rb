@@ -4,6 +4,7 @@ class TasksController < ApplicationController
   end
 
   def show
+    @task = Task.find(params[:id])
   end
 
   def new
@@ -11,12 +12,24 @@ class TasksController < ApplicationController
   end
 
   def create
-    task = params[:task].permit(:title, :description)
-    Task.create(task)
-    redirect_to root_path, notice: "タスク「#{task.title}」を登録しました"
+    task = Task.create(task_params)
+    redirect_to task, notice: "タスク「#{task.title}」を作成しました。"
   end
 
   def edit
+    @task = Task.find(params[:id])
+  end
+
+  def update
+    task = Task.find(params[:id])
+    task.update(task_params)
+    redirect_to task, notice: "タスク「#{task.title}」を更新しました。"
+  end
+
+  private
+
+  def task_params
+    params.require(:task).permit(:title, :description)
   end
 
 end
