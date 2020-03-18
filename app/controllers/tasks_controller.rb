@@ -1,6 +1,6 @@
 class TasksController < ApplicationController
   def index
-    @tasks = Task.all
+    @tasks = Task.all.order(created_at: "DESC")
   end
 
   def show
@@ -12,7 +12,7 @@ class TasksController < ApplicationController
   end
 
   def create
-    task = Task.create(task_params)
+    task = Task.create!(task_params)
     redirect_to task, notice: "タスク「#{task.title}」を登録しました。"
   end
 

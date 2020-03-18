@@ -1,6 +1,6 @@
-= form_with model: task, local: true do |f|
+= form_with model: @task, local: true do |f|
   .form_group
-    = f.label :name
+    = f.label :title
     = f.text_field:title, class: 'form-control', id: 'title'
   .form_group
      = f.label :description
