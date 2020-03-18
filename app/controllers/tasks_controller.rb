@@ -13,7 +13,7 @@ class TasksController < ApplicationController
 
   def create
     task = Task.create(task_params)
-    redirect_to task, notice: "タスク「#{task.title}」を作成しました。"
+    redirect_to task, notice: "タスク「#{task.title}」を登録しました。"
   end
 
   def edit
@@ -24,6 +24,12 @@ class TasksController < ApplicationController
     task = Task.find(params[:id])
     task.update(task_params)
     redirect_to task, notice: "タスク「#{task.title}」を更新しました。"
+  end
+
+  def destroy
+    task = Task.find(params[:id])
+    task.destroy
+    redirect_to tasks_url, notice: "タスク「#{task.title}」を削除しました。"
   end
 
   private
