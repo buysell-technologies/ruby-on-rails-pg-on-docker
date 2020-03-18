@@ -6,4 +6,5 @@ ja:
       task:
         title: タイトル
         description: 詳細
+        status: 状態
         deadline_date: 期限

@@ -6,12 +6,14 @@ table.table.table-hover
   thead.thead-default
     tr
       th= Task.human_attribute_name(:title)
+      th= Task.human_attribute_name(:status)
       th= Task.human_attribute_name(:deadline_date)
       th= Task.human_attribute_name(:created_at)
     tboby
       - @tasks.each do |task|
         tr
           td= link_to task.title, task
+          td= task.status
           td= task.deadline_date
           td= task.created_at
           td

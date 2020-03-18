@@ -17,6 +17,9 @@ table.table.table-hover
         th= Task.human_attribute_name(:deadline_date)
         td= @task.deadline_date
       tr
+        th= Task.human_attribute_name(:status)
+        td= @task.status
+      tr
         th= Task.human_attribute_name(:create_at)
         td= @task.created_at
       tr
