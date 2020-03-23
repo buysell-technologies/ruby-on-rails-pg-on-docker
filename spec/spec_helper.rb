@@ -17,6 +17,7 @@
 require 'capybara/rspec'
 
 RSpec.configure do |config|
+  ENV["RAILS_ENV"] = 'test'
   config.before(:each, type: :system) do
     driven_by :selenium_chrome_headless
   end
