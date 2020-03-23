@@ -1,14 +1,6 @@
 h1 タスク一覧
 = search_form_for @q do |f|
-  .form-group.row
-    = f.label :title_cont, 'タイトル', class: 'col-sm-2 col-form-label'
-    .col-sm-10
-      = f.search_field :title_cont
-  .form-group.row
-    = f.label :status, 'ステータス', class: 'col-sm-2 col-form-label'
-    .col-sm-10
-      = f.search_field :status_eq
-
+  = f.search_field :keywords_cont_all, required: false, label: t('helpers.keywords')
   = f.submit
 end
 

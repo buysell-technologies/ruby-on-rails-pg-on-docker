@@ -1,5 +1,7 @@
 class TasksController < ApplicationController
   def index
+    keywords = params.dig(:q, :keywords_cont_all)&.split(/[[:space:]]/)
+    params[:q][:keywords_cont_all] = keywords if keywords
     @q = Task.ransack(params[:q])
     @tasks = @q.result(distinct: true).page(params[:page])
   end
