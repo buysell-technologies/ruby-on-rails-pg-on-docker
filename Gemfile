@@ -72,3 +72,7 @@ gem 'slim-rails'
 
 # Use pagination
 gem 'kaminari'
+# Use bootstrap4
+gem 'bootstrap', '~> 4.3.1'
+# Use jquery to use bootstrap4
+gem 'jquery-rails'
