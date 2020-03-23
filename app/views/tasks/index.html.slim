@@ -20,12 +20,14 @@ table.table.table-hover
   thead.thead-default
     tr
       th= Task.human_attribute_name(:title)
+      th= sort_link(@q, :important)
       th= Task.human_attribute_name(:status)
       th= sort_link(@q, :deadline_date)
       th= sort_link(@q, :created_at)
       - @tasks.each do |task|
         tr
           td= link_to task.title, task
+          td= task.important
           td= task.status
           td= task.deadline_date
           td= task.created_at
