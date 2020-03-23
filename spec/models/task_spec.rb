@@ -33,4 +33,40 @@ RSpec.describe Task, type: :model do
       expect(task).to_not be_valid
     end
   end
+
+  
+  let(:second_task){ FactoryBot.build(:second_task) }
+  describe '検索' do    
+    describe 'タイトル' do
+      subject { Task.find_by(title: title) }
+
+      context '掃除というタスクを検索' do
+        before do
+          task = create(:task)
+        end
+        let(:title) { '掃除' }
+        it { is_expected.to eq task }
+      end
+      context 'カリキュラムというタスクを検索' do
+        let(:title) { 'カリキュラム' }
+        it { is_expected.to eq nil }
+      end
+    end
+
+    describe 'ステータス' do
+      subject { Task.find_by(status: status) }
+
+      context '未着手を検索' do
+        before do
+          second_task = create(:second_task)
+        end
+        let(:status) { '未着手' }
+        it { is_expected.to eq second_task }
+      end
+      context '作業中を検索' do
+        let(:status) { '作業中' }
+        it { is_expected.to eq nil }
+      end
+    end
+  end
 end
