@@ -7,7 +7,7 @@
      = f.text_area :description, row: 5, class: 'form-control', id: 'task_description'
   .form_group
      = f.label :status
-     = f.select :status, options_for_select(Task.statuses.keys.map {|k| [Task.statuses[k], k]}), class: 'form-control', id: 'task_status'
+     = f.select :status, options_for_select(Task.statuses_i18n.keys.map {|k| [Task.statuses_i18n[k], k]}), class: 'form-control', id: 'task_status'
   .form_group
      = f.label :deadline_date
      = f.date_field :deadline_date, class: 'form-control', id: 'task_deadline_date'
