@@ -10,6 +10,6 @@
     ['鈴木花子', 'test@example.com', 'aaaabbbb']
 ].each do |name, email, pass|
     User.create!(
-        {name: name, email: email, password_digest: pass}
+        {name: name, email: email, password: pass, password_confirmation: pass}
     )
 end
