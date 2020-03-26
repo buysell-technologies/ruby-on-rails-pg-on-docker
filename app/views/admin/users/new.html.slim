@@ -1,20 +1,6 @@
-h1 タスク新規登録
+h1 ユーザー新規登録
 
-= form_with model: [:admin, @user], local: true do |f|
-  .form_group
-    = f.label :name
-    = f.text_field :name, class: 'form-control'
-  .form_group
-     = f.label :email
-     = f.text_field :email, class: 'form-control'
-  .form_check
-     = f.label :admin, class: 'form-check-label' do
-       = f.check_box :admin, class: 'form-check-input'
-       | 管理者権限
-  .form_group
-     = f.label :password
-     = f.password_field :password, class: 'form-control'
-  .form_group
-     = f.label :password_confirmation
-     = f.password_field :password_confirmation, class: 'form-control'
-  = f.submit '登録', class: 'btn-primary'
+.nav.justify-content-end
+  = link_to '一覧', admin_users_path, class: `nav_link`
+
+= render partial: 'form', locals: { user: @user }
