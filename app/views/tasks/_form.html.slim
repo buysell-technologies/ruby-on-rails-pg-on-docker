@@ -11,4 +11,7 @@
   .form_group
      = f.label :deadline_date
      = f.date_select :deadline_date, class: 'form-control', id: 'task_deadline_date'
+  .form_group
+     = f.label :important
+     = f.check_box :important, {class: 'form-control', id: 'task_important'}, 1, 0
   = f.submit nil, class: 'btn-primary'
