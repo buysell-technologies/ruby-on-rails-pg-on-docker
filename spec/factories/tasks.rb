@@ -1,6 +1,7 @@
 FactoryBot.define do
   factory :task do
-    title: "勉強"
-    description: "数学"
+    title { '掃除' }
+    description { '家の掃除をする' }
+    created_at { Time.now }
   end
 end

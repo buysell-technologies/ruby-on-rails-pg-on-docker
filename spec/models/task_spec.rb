@@ -2,11 +2,8 @@ require 'rails_helper'
 
 RSpec.describe Task, type: :model do
   it"タイトルと内容がある場合、有効" do
-    task = Task.new(
-      title: "家事",
-      description: "キッチン"
-    )
-    expect(task).to be_valid
+    @task = FactoryBot.build(:task)
+    expect(@task).to be_valid
   end
 
   it"タイトルがない場合、無効" do
@@ -21,11 +18,8 @@ RSpec.describe Task, type: :model do
   describe 'タイトルの文字数' do
     context 'タイトルが30文字以内場合' do
       it"有効" do
-        task = Task.new(
-          title: "s" * 30,
-          description: "キッチン"
-        )
-        expect(task).to be_valid
+        @task = FactoryBot.build(:task)
+        expect(@task).to be_valid
       end
     end
 
