@@ -18,6 +18,8 @@ gem 'uglifier', '>= 1.3.0'
 
 # Use i18n
 gem 'rails-i18n', '~> 5.1'
+# Use search
+gem 'ransack'
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.2'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
@@ -40,8 +42,12 @@ group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'html2slim'
+  gem 'rspec'
   gem 'rspec-rails'
   gem 'factory_bot_rails'
+  gem 'pry-rails'
+  gem 'pry-byebug'
+  gem 'pry-doc'
 end
 
 group :development do

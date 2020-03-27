@@ -1,4 +1,18 @@
 h1 タスク一覧
+= search_form_for @q do |f|
+  .form-group.row
+    = f.label :title_cont, 'タイトル', class: 'col-sm-2 col-form-label'
+    .col-sm-10
+      = f.search_field :title_cont
+  .form-group.row
+    = f.label :status, 'ステータス', class: 'col-sm-2 col-form-label'
+    .col-sm-10
+      = f.search_field :status_eq
+
+  = f.submit
+end
+
+div 
 = link_to '新規登録', new_task_path, class: 'btn btn-primary'
 
 .mb-3
@@ -6,12 +20,13 @@ table.table.table-hover
   thead.thead-default
     tr
       th= Task.human_attribute_name(:title)
-      th= Task.human_attribute_name(:deadline_date)
-      th= Task.human_attribute_name(:created_at)
-    tboby
+      th= Task.human_attribute_name(:status)
+      th= sort_link(@q, :deadline_date)
+      th= sort_link(@q, :created_at)
       - @tasks.each do |task|
         tr
           td= link_to task.title, task
+          td= task.status
           td= task.deadline_date
           td= task.created_at
           td

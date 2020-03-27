@@ -1,6 +1,7 @@
 class TasksController < ApplicationController
   def index
-    @tasks = Task.all.order(deadline_date: "ASC")
+    @q = Task.ransack(params[:q])
+    @tasks = @q.result(distinct: true)
   end
 
   def show
@@ -35,7 +36,11 @@ class TasksController < ApplicationController
   private
 
   def task_params
-    params.require(:task).permit(:title, :description, :deadline_date)
+    params.require(:task).permit(:title, :description, :deadline_date, :status)
+  end
+
+  def search_params
+    params.require(:q).permit!
   end
 
 end
