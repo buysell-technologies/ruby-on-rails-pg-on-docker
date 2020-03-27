@@ -69,6 +69,11 @@ end
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 gem 'slim-rails'
-
+# Use enum_help
+gem 'enum_help'
 # Use pagination
 gem 'kaminari'
+# Use bootstrap4
+gem 'bootstrap', '~> 4.3.1'
+# Use jquery to use bootstrap4
+gem 'jquery-rails'
