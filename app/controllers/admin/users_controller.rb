@@ -1,6 +1,7 @@
 class Admin::UsersController < ApplicationController
   def index
-    @users = User.all
+    @q = User.ransack(params[:q])
+    @users = @q.result.eager_load(:tasks).page(params[:page])
   end
 
   def show
