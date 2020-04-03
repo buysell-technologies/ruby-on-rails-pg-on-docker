@@ -1,0 +1,37 @@
+<h1>タスク作成</h1>
+
+<%= form_for(@task) do |f| %>
+<div>
+  <%= f.label :name, 'タスク名' %>
+  <%= f.text_field :name %>
+</div>
+<div>
+  <%= f.label :content, 'タスク内容' %>
+</div>
+<div>
+  <%= f.text_area :content, :size=>"70x10" %>
+</div>
+<div>
+  <%= f.label :name, 'ラベル' %>
+  <%= f.text_field :label %>
+</div>
+<div>
+  <%= f.label :priority, '優先度' %>
+  <%= f.select :priority, [["後回し", "0"], ["時間が空き次第", "1"], ["普通", "2"],["なるべく早く", "3"], ["緊急", "4"]],:selected=>2 %>
+</div>
+<div>
+  <%= f.label :deadline, '終了時間' %>
+  <%= f.datetime_field :deadline %>
+</div>
+<div>
+  <%= f.label :status, 'ステータス' %>
+  <%= f.select :status, [["未着手", "0"], ["着手", "1"], ["完了", "2"]],:selected=>0 %>
+</div>
+
+<div>
+  <%= f.submit 'タスク作成' %>
+</div>
+<% end %>
+
+
+<%= link_to 'タスク一覧へ', tasks_path %>

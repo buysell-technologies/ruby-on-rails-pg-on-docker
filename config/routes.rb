@@ -3,5 +3,5 @@ Rails.application.routes.draw do
   #トップページはタスク一覧
   root to: 'tasks#index'
   #index のみ排除
-  resources :tasks, except: [:index]
+  resources :tasks
 end
