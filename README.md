@@ -21,4 +21,4 @@
     * status(0:未着手, 1:着手,　2:完了) : integer
     * deadline : time
     * priority : intger
-    * user_id : intger(外部制約)
+    * user_id : intger(外部制約.ユーザーテープル追加時にカラムを後から追加)
