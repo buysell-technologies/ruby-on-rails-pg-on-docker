@@ -6,6 +6,8 @@ class Admin::UsersController < ApplicationController
 
   def show
     @user = User.find(params[:id])
+    @q = @user.tasks.ransack(params[:q])
+    @tasks = @q.result.eager_load(:user)
   end
 
   def new
