@@ -1,5 +1,5 @@
 class TasksController < ApplicationController
-    before_action :find_task, only: [:show, :edit, :update, :destroy]
+    before_action :set_task, only: [:show, :edit, :update, :destroy]
 
     def index
         @tasks = Task.all
@@ -49,7 +49,7 @@ class TasksController < ApplicationController
     private
 
     # 繰り返し除去のために定義。before_actionで使うといちいち記述しなくて良い
-    def find_task
+    def set_task
         @task = Task.find(params[:id])
     end
 
