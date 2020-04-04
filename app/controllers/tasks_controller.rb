@@ -1,10 +1,11 @@
 class TasksController < ApplicationController
+    before_action :find_task, only: [:show, :edit, :update, :destroy]
+
     def index
         @tasks = Task.all
     end
   
     def show
-        @task = Task.find(params[:id])
     end
   
     def new
@@ -27,12 +28,9 @@ class TasksController < ApplicationController
     end
   
     def edit
-        @task = Task.find(params[:id])
     end
   
     def update
-        @task = Task.find(params[:id])
-
         if @task.update(task_params)
             flash[:success] = 'タスク更新完了'
             redirect_to @task
@@ -43,15 +41,27 @@ class TasksController < ApplicationController
     end
   
     def destroy
-        @task = Task.find(params[:id])
         @task.destroy
 
         redirect_to tasks_url
     end
 
-    # セキュリティ対策
     private
+
+    # 繰り返し除去のために定義。before_actionで使うといちいち記述しなくて良い
+    def find_task
+        @task = Task.find(params[:id])
+    end
+
+    # セキュリティ対策(ストロングパラメータ)
     def task_params
-        params.require(:task).permit(:name,:content,:label,:status,:deadline,:priority)
+        params.require(:task).permit(
+            :name,
+            :content,
+            :label,
+            :status,
+            :deadline,
+            :priority
+        )
     end
 end
