@@ -3,47 +3,36 @@ class TasksController < ApplicationController
 
     def index
         @tasks = Task.all
+        render json: @tasks
     end
   
     def show
+        render json: @task
     end
-  
-    def new
-        #デフォルト値を指定する場合ここに記載
-        @task = Task.new
-    end
-  
+
+    # curl -X POST -H "Content-Type: application/json" -d '{"name":"test title 200","content":"test content text200","label":"test label","status":0,"deadline":"2020-04-07T00:15:46.020+09:00","priority":2}' http://0.0.0.0/tasks
     def create
-        # ストロングパラメータによるフィルタに通す
+        # ストロングパラメータによるフィルタに通す(before_actionに記載)
         @task = Task.new(task_params)
 
         if @task.save
-            flash[:success] = 'タスク作成完了'
-            redirect_to @task
+            render json: {status: "create task",data: @task}
           else
-            # renderはnewアクションを実行せずに移動
-            flash[:danger] = 'タスク作成失敗!!!!'
-            render :new
+            render json: {status:unprocessable_entity,data: @task.errors}
           end
     end
-  
-    def edit
-    end
-  
-    def update
+
+    # curl -X PUT -H "Content-Type: application/json" -d '{"name":"test title 200","content":"test content text200","label":"test label","status":0,"deadline":"2020-04-07T00:15:46.020+09:00","priority":2}' http://0.0.0.0/tasks
+   def update
         if @task.update(task_params)
-            flash[:success] = 'タスク更新完了'
-            redirect_to @task
+            render json: {status: "update task",data: @task}
         else
-            flash[:success] = 'タスク更新失敗!!!!'
-            render :edit
+            render {status:unprocessable_entity,data: @task.errors}
         end
     end
   
     def destroy
         @task.destroy
-
-        redirect_to tasks_url
     end
 
     private

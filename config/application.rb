@@ -32,5 +32,8 @@ module App
 
     # タイムゾーンの設定
     config.time_zone = "Tokyo"
+
+    # api用
+    config.api_only = true
   end
 end
