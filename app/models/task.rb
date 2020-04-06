@@ -11,6 +11,8 @@ class Task < ApplicationRecord
     has_many :relation_task_labels
     has_many :labels, through: :relation_task_labels
 
+    belongs_to :user
+
     def add_label(label)
         # 同一ラベルが複数付与される事を防ぐ
         self.relation_task_labels.find_or_create_by(label_id: label.id)
