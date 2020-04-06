@@ -47,10 +47,16 @@ group :development do
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
+  # ER図生成
+  gem 'ruby-graphviz'
+  gem 'rails-erd'
 end
 
 group :test do
   gem 'selenium-webdriver'
+  gem 'rspec-rails'
+  gem 'capybara'
+  gem 'factory_bot'
 end
 
 

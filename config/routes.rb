@@ -3,5 +3,11 @@ Rails.application.routes.draw do
   #トップページはタスク一覧
   root to: 'tasks#index'
   
-  resources :tasks
+  resources :tasks do
+    member do
+      get :labels
+    end
+  end
+  resources :labels
+
 end

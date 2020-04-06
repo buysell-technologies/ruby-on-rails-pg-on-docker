@@ -5,12 +5,19 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+Label.create(name: "work")
+Label.create(name: "private")
+Label.create(name: "family")
+
 (1..10).each do |i|
     Task.create(name: "test title " + i.to_s,
                 content: "test content text" + i.to_s,
-                label: "test label",
                 status: 0,
                 deadline: Time.zone.now.tomorrow,
                 priority: 2
                 )
 end
+
+Label.create(name: "work")
+Label.create(name: "private")
+Label.create(name: "family")
