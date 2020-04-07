@@ -14,8 +14,8 @@ class TasksController < ApplicationController
 
     # curl -X POST -H "Content-Type: application/json" -d '{"name":"test title 200","content":"test content text200","label":"test label","status":0,"deadline":"2020-04-07T00:15:46.020+09:00","priority":2}' http://0.0.0.0/tasks
     def create
-        @task = Task.new(task_params,user_id: @auth_user.id)
-        # @task.update(user_id: @auth_user.id)
+        @task = Task.new(task_params)
+        @task.update(user_id: @auth_user.id)
 
         if @task.save
             render json: { status: 'SUCCESS', data: @task }
@@ -62,7 +62,7 @@ class TasksController < ApplicationController
     end
 
     def check_user
-        if @auth_user.id == @task.user_id.to_i
+        if @auth_user.id == @task.user_id
             true
         else
             render json: { status: 'ERROR', message: 'Please login by currect user'}

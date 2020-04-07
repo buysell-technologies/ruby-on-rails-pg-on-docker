@@ -8,7 +8,7 @@ class Task < ApplicationRecord
     # priorityは0~4の整数
     validates :priority,  presence: true, numericality: {only_integer: true, less_than: 5}
 
-    has_many :relation_task_labels
+    has_many :relation_task_labels, dependent: :destroy
     has_many :labels, through: :relation_task_labels
 
     belongs_to :user

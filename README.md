@@ -101,9 +101,6 @@ curl -X GET -H "Authorization: Token swAeDfHGyqGJao2tVwj4jrkG" -H "Content-Type:
 curl -X POST -H "Authorization: Token swAeDfHGyqGJao2tVwj4jrkG" -H "Content-Type: application/json" -d '{"name":"test title","content":"test content text200","status":0,"deadline":"2020-04-07T00:15:46.020+09:00","priority":2}' http://0.0.0.0/tasks 
 ```
 ```
-curl -X POST -H "Authorization: Token n68TyqJdLtv21CiuDZz12euz" -H "Content-Type: application/json" -d '{"name":"test title","content":"test content text200","status":0,"deadline":"2020-04-07T00:15:46.020+09:00","priority":2}' http://0.0.0.0/tasks 
-```
-```
 {   "status":"SUCCESS",
     "data":{
         "id":207,
