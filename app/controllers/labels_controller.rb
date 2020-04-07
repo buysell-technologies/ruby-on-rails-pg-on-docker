@@ -1,6 +1,7 @@
 class LabelsController < ApplicationController
+    before_action :set_label, only: [:show, :update, :destroy]
     before_action :authenticate
-    before_action :set_label, only: [:show, :edit, :update, :destroy]
+    before_action :check_user, only: [:show,:update,:destroy]
 
     def index
         @labels = Label.includes(@user)

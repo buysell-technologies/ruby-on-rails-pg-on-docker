@@ -176,7 +176,23 @@ curl -X DELETE -H "Authorization: Token swAeDfHGyqGJao2tVwj4jrkG" -H "Content-Ty
 すべてログイン認証必須
 ## Label index
 ```
-curl -X GET -H "Authorization: Token n68TyqJdLtv21CiuDZz12euz" -H "Content-Type: application/json" http://0.0.0.0/tasks/1/labels
+curl -X GET -H "Authorization: Token Vk5ZdShmsPaGj1DBj7S3tuFX" -H "Content-Type: application/json" http://0.0.0.0/tasks/2/labels
 ```
 ```
+{"status":"SUCCESS",
+"message":"Label for this task",
+"data":[{
+    "id":3,"name":"label c",
+    "created_at":"2020-04-07T16:01:16.460+09:00",
+    "updated_at":"2020-04-07T16:01:16.460+09:00"
+    },
+    {"id":1,"name":"label a",
+    ...
+    }
+    ]}
+```
+
+## ADD Label
+```
+curl -X POST -H "Authorization: Token Vk5ZdShmsPaGj1DBj7S3tuFX" -H "Content-Type: application/json" http://0.0.0.0/relation_task_label -d '{"task_id":"2","label":"test label"}'
 ```
