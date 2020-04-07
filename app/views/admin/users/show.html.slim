@@ -1,0 +1,50 @@
+h1 ユーザー詳細
+
+.nav.justify-content-end
+  = link_to '一覧', admin_users_path, class: `nav_link`
+table.table.table-hover
+  tboby
+      tr
+        th= User.human_attribute_name(:id)
+        td= @user.id
+      tr
+        th= User.human_attribute_name(:name)
+        td= @user.name
+      tr
+        th= User.human_attribute_name(:email)
+        td= @user.email
+      tr
+        th= User.human_attribute_name(:created_at)
+        td= @user.created_at
+      tr
+        th= User.human_attribute_name(:updated_at)
+        td= @user.updated_at
+
+
+= "#{@user.name}のタスク一覧"
+
+table.table.table-hover
+  thead.thead-default
+    tr
+      th= Task.human_attribute_name(:title)
+      th= sort_link(@q, :important)
+      th= Task.human_attribute_name(:status)
+      th= sort_link(@q, :deadline_date)
+      th= sort_link(@q, :created_at)
+    tbody
+      - @tasks.each do |task|
+        tr
+          td= task.title
+          - if task.important == true
+            td 重要
+          - else
+            td= 
+          td= task.status
+          - if task.deadline_date - today > 0
+            td= diffDate(task.deadline_date)
+          - else
+            td 期限が過ぎています
+          td= task.created_at
+
+= link_to '編集', edit_admin_user_path, class: 'btn btn-primary mr-3'
+= link_to '削除', [:admin, @user], method: :delete, data: { confirm: "ユーザー「#{@user.name}」を削除します。よろしいですか？"}, class: 'btn btn-danger'

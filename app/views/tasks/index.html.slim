@@ -19,6 +19,7 @@ table.table.table-hover
       th= Task.human_attribute_name(:status)
       th= sort_link(@q, :deadline_date)
       th= sort_link(@q, :created_at)
+    tbody
       - @tasks.each do |task|
         tr
           td= link_to task.title, task

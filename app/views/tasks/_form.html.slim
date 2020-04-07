@@ -1,7 +1,7 @@
 = form_with model: @task, local: true do |f|
   .form_group
     = f.label :title
-    = f.text_field:title, class: 'form-control', id: 'title'
+    = f.text_field :title, class: 'form-control', id: 'title'
   .form_group
      = f.label :description
      = f.text_area :description, row: 5, class: 'form-control', id: 'task_description'
@@ -11,7 +11,8 @@
   .form_group
      = f.label :deadline_date
      = f.date_field :deadline_date, class: 'form-control', id: 'task_deadline_date'
-  .form_group
-     = f.label :important
-     = f.check_box :important, {class: 'form-control', id: 'task_important'}, 1, 0
+  .form_check
+     = f.label :important, class: 'form-check-label' do
+      = f.check_box :important, class: 'form-check-input'
+      | 重要
   = f.submit nil, class: 'btn-primary'
