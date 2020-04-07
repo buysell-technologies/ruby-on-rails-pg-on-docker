@@ -1,42 +1,50 @@
 class TasksController < ApplicationController
-    before_action :set_task, only: [:show, :edit, :update, :destroy]
+    before_action :set_task, only: [:show, :update, :destroy, :labels]
+    before_action :authenticate
+    before_action :check_user, only: [:show,:update,:destroy,:labels]
 
     def index
-        @tasks = Task.all
-        render json: @tasks
+        @tasks = @auth_user.tasks.order(created_at: :desc)
+        render json: { status: 'SUCCESS', message: 'index tasks', data: @tasks }
     end
   
     def show
-        render json: @task
+        render json: { status: 'SUCCESS', message: 'show tasks', data: @task }
     end
 
     # curl -X POST -H "Content-Type: application/json" -d '{"name":"test title 200","content":"test content text200","label":"test label","status":0,"deadline":"2020-04-07T00:15:46.020+09:00","priority":2}' http://0.0.0.0/tasks
     def create
-        # ストロングパラメータによるフィルタに通す(before_actionに記載)
-        @task = Task.new(task_params)
+        @task = Task.new(task_params,user_id: @auth_user.id)
+        # @task.update(user_id: @auth_user.id)
 
         if @task.save
-            render json: {status: "create task",data: @task}
+            render json: { status: 'SUCCESS', data: @task }
           else
-            render json: {status:unprocessable_entity,data: @task.errors}
+            render json: { status: 'ERROR', data: @task.errors }
           end
     end
 
     # curl -X PUT -H "Content-Type: application/json" -d '{"name":"test title 200","content":"test content text200","label":"test label","status":0,"deadline":"2020-04-07T00:15:46.020+09:00","priority":2}' http://0.0.0.0/tasks
-   def update
+    def update
         if @task.update(task_params)
-            render json: {status: "update task",data: @task}
+            render json: { status: 'SUCCESS', data: @task }
         else
-            render {status:unprocessable_entity,data: @task.errors}
+            render json: { status: 'ERROR', data: @task.errors }
         end
     end
   
     def destroy
         @task.destroy
+        render json: { status: 'SUCCESS', message: 'Deleted task', data: @task }
+    end
+
+    def labels
+        @labels = @task.labels
+        render json: { status: 'SUCCESS', message: 'Label for this task', data: @labels}
     end
 
     private
-
+    
     # 繰り返し除去のために定義。before_actionで使うといちいち記述しなくて良い
     def set_task
         @task = Task.find(params[:id])
@@ -47,10 +55,17 @@ class TasksController < ApplicationController
         params.require(:task).permit(
             :name,
             :content,
-            :label,
             :status,
             :deadline,
             :priority
         )
+    end
+
+    def check_user
+        if @auth_user.id == @task.user_id.to_i
+            true
+        else
+            render json: { status: 'ERROR', message: 'Please login by currect user'}
+        end
     end
 end

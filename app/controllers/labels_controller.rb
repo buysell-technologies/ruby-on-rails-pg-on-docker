@@ -1,8 +1,9 @@
 class LabelsController < ApplicationController
+    before_action :authenticate
     before_action :set_label, only: [:show, :edit, :update, :destroy]
 
     def index
-        @labels = Label.all
+        @labels = Label.includes(@user)
         render json: @labels
     end
   

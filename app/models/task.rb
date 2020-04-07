@@ -20,7 +20,7 @@ class Task < ApplicationRecord
 
     def delete_label(label)
         relationtasklabel = self.relation_task_labels.find_by(label_id: label.id)
-        relationtasklabel.destroy if relationship
+        relationtasklabel.destroy if relationtasklabel
     end
 
     # N+1問題対策
