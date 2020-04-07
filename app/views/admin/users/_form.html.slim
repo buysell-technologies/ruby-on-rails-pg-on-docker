@@ -5,10 +5,6 @@
   .form_group
      = f.label :email
      = f.text_field :email, class: 'form-control'
-  .form_check
-     = f.label :admin, class: 'form-check-label' do
-       = f.check_box :admin, class: 'form-check-input'
-       | 管理者権限
   .form_group
      = f.label :password
      = f.password_field :password, class: 'form-control'
