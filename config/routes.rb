@@ -9,11 +9,11 @@ Rails.application.routes.draw do
   resources :tasks do
     member do
       get :labels
-      post 'relation_task_label', to: "relation_tasks_labels#create"
+      post 'add_label', to: 'relation_task_labels#create'
+      delete 'delete_label/:label_id', to: 'relation_task_labels#destroy'
     end
   end
 
-  resources :relation_task_label, only: [:create, :destroy]
-
-
+  # このルートはいらないもしくは管理ユーザーに絞ったほうがいいかも
+  resources :labels, only: [:show, :create, :update,:destroy]
 end

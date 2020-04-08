@@ -68,6 +68,8 @@ curl -X GET -H "Authorization: Token n68TyqJdLtv21CiuDZz12euz" -H "Content-Type:
         }}
 ```
 
+---
+
 # Task
 ログイン認証が必須
 ## Index task
@@ -172,27 +174,110 @@ curl -X DELETE -H "Authorization: Token swAeDfHGyqGJao2tVwj4jrkG" -H "Content-Ty
 }
 ```
 
+---
+
 # Label
 すべてログイン認証必須
-## Label index
+
+## 特定タスクに付与されたラベルの一覧
 ```
 curl -X GET -H "Authorization: Token Vk5ZdShmsPaGj1DBj7S3tuFX" -H "Content-Type: application/json" http://0.0.0.0/tasks/2/labels
 ```
 ```
-{"status":"SUCCESS",
-"message":"Label for this task",
-"data":[{
-    "id":3,"name":"label c",
-    "created_at":"2020-04-07T16:01:16.460+09:00",
-    "updated_at":"2020-04-07T16:01:16.460+09:00"
-    },
-    {"id":1,"name":"label a",
-    ...
-    }
+{   "status":"SUCCESS",
+    "message":"Label for this task",
+    "data":[{
+        "id":3,
+        "name":"label c",
+        "created_at":"2020-04-07T16:01:16.460+09:00",
+        "updated_at":"2020-04-07T16:01:16.460+09:00"
+        },
+        {"id":1,
+        "name":"label a",
+        ...略
+        }]
+}
+```
+
+## 特定タスクにラベルを付与
+```
+curl -X POST -H "Authorization: Token Vk5ZdShmsPaGj1DBj7S3tuFX" -H "Content-Type: application/json" http://0.0.0.0/tasks/2/add_label -d '{"name":"Add Label"}'
+```
+```
+{   "status":"SUCCESS",
+    "data":[{
+        "id":3,"name":"label c",
+        "created_at":"2020-04-07T16:01:16.460+09:00",
+        "updated_at":"2020-04-07T16:01:16.460+09:00"},
+        {"id":1,"name":"label a",
+        "created_at":"2020-04-07T16:01:16.447+09:00",
+        "updated_at":"2020-04-07T16:01:16.447+09:00"},
+        ...略
     ]}
 ```
 
-## ADD Label
+## 特定タスクのラベルを削除
 ```
-curl -X POST -H "Authorization: Token Vk5ZdShmsPaGj1DBj7S3tuFX" -H "Content-Type: application/json" http://0.0.0.0/relation_task_label -d '{"task_id":"2","label":"test label"}'
+curl -X DELETE -H "Authorization: Token Vk5ZdShmsPaGj1DBj7S3tuFX" -H "Content-Type: application/json" http://0.0.0.0/tasks/2/delete_label/3'
+```
+```
+{"status":"SUCCESS","message":"Deleted Label"}
+```
+
+---
+
+以下はとりあえず作ったがもしかしたらいらないかも
+## Show Label
+```
+curl -X GET -H "Authorization: Token Vk5ZdShmsPaGj1DBj7S3tuFX" -H "Content-Type: application/json" http://0.0.0.0/labels/1
+```
+```
+{   "id":1,
+    "name":"label a",
+    "created_at":"2020-04-07T16:01:16.447+09:00",
+    "updated_at":"2020-04-07T16:01:16.447+09:00"
+}
+```
+
+## Create Label(いらないかも)
+```
+    curl -X POST -H "Authorization: Token Vk5ZdShmsPaGj1DBj7S3tuFX" -H "Content-Type: application/json" http://0.0.0.0/labels -d '{"name":"label d"}'
+```
+```
+{   "status":"create label",
+    "data":{
+        "id":4,
+        "name":"label d",
+        "created_at":"2020-04-08T10:51:29.341+09:00",
+        "updated_at":"2020-04-08T10:51:29.341+09:00"}
+} 
+```
+
+### Update Label(いらないかも)
+```
+curl -X PUT -H "Authorization: Token Vk5ZdShmsPaGj1DBj7S3tuFX" -H "Content-Type: application/json" http://0.0.0.0/labels/4 -d '{"name":"change label d"}'
+```
+```
+{   "status":"update label",
+    "data":{
+        "id":4,
+        "name":"change label d",
+        "created_at":"2020-04-08T10:51:29.341+09:00",
+        "updated_at":"2020-04-08T11:30:07.853+09:00"}
+}
+``` 
+
+### Delete Label
+```
+curl -X DELETE -H "Authorization: Token Vk5ZdShmsPaGj1DBj7S3tuFX" -H "Content-Type: application/json" http://0.0.0.0/labels/5
+```
+```
+{   "status":"SUCCESS",
+    "message":"Deleted Label",
+    "data":{
+        "id":5,
+        "name":"label d",
+        "created_at":"2020-04-08T12:37:31.821+09:00",
+        "updated_at":"2020-04-08T12:37:31.821+09:00"}
+}
 ```

@@ -1,5 +1,5 @@
 class TasksController < ApplicationController
-    before_action :set_task, only: [:show, :update, :destroy, :labels]
+    before_action :set_task, only: [:show, :update, :destroy, :labels,:create_label]
     before_action :authenticate
     before_action :check_user, only: [:show,:update,:destroy,:labels]
 
@@ -43,6 +43,7 @@ class TasksController < ApplicationController
         render json: { status: 'SUCCESS', message: 'Label for this task', data: @labels}
     end
 
+    
     private
     
     # 繰り返し除去のために定義。before_actionで使うといちいち記述しなくて良い

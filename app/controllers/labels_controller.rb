@@ -1,12 +1,6 @@
 class LabelsController < ApplicationController
     before_action :set_label, only: [:show, :update, :destroy]
     before_action :authenticate
-    before_action :check_user, only: [:show,:update,:destroy]
-
-    def index
-        @labels = Label.includes(@user)
-        render json: @labels
-    end
   
     def show
         render json: @label
@@ -35,6 +29,7 @@ class LabelsController < ApplicationController
   
     def destroy
         @label.destroy
+        render json: { status: 'SUCCESS', message: 'Deleted task', data: @label}
     end
 
     private
