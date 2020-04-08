@@ -5,6 +5,15 @@ class User < ApplicationRecord
     validates :email, presence: true, uniqueness: true
     validates :password, length: { minimum: 6 }, presence: true
 
-    has_many :tasks
     has_many :tasks, dependent: :destroy
+
+    before_destroy :least_admin_user
+
+    private
+
+    def least_admin_user
+        if User.count < 2 && User.where('admin = true')
+            throw :abort
+        end
+    end
 end
