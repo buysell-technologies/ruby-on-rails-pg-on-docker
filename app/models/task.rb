@@ -6,6 +6,9 @@ class Task < ApplicationRecord
 
     belongs_to :user
 
+    has_many :task_labels, dependent: :destroy
+    has_many :labels, through: :task_labels
+
     ransacker :keywords do |tasks|
         Arel::Nodes::InfixOperation.new('||', tasks.table[:title], tasks.table[:description])
       end
