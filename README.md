@@ -239,7 +239,7 @@ curl -X GET -H "Authorization: Token Vk5ZdShmsPaGj1DBj7S3tuFX" -H "Content-Type:
 }
 ```
 
-## Create Label(いらないかも)
+## Create Label
 ```
     curl -X POST -H "Authorization: Token Vk5ZdShmsPaGj1DBj7S3tuFX" -H "Content-Type: application/json" http://0.0.0.0/labels -d '{"name":"label d"}'
 ```
@@ -253,7 +253,7 @@ curl -X GET -H "Authorization: Token Vk5ZdShmsPaGj1DBj7S3tuFX" -H "Content-Type:
 } 
 ```
 
-### Update Label(いらないかも)
+### Update Label
 ```
 curl -X PUT -H "Authorization: Token Vk5ZdShmsPaGj1DBj7S3tuFX" -H "Content-Type: application/json" http://0.0.0.0/labels/4 -d '{"name":"change label d"}'
 ```

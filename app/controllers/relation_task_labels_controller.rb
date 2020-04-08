@@ -1,6 +1,7 @@
 class RelationTaskLabelsController < ApplicationController
   before_action :set_task
   before_action :authenticate
+  before_action :check_user
 
   def create
     @label = Label.find_or_create_by(name: params[:name])
