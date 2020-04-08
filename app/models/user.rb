@@ -10,10 +10,10 @@ class User < ApplicationRecord
     before_destroy :least_admin_user
 
     private
-
+    
     def least_admin_user
-        if User.count < 2 && User.where('admin = true')
-            throw :abort
+        if self.admin?
+            throw :abort if User.where(admin: true).count < 2
         end
     end
 end
