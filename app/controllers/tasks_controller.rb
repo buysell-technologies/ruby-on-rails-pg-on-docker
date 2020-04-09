@@ -8,10 +8,12 @@ class TasksController < ApplicationController
 
   def show
     @task = current_user.tasks.find(params[:id])
+    @label = Label.all
   end
 
   def new
     @task = Task.new
+    @label = Label.new
   end
 
   def create
@@ -21,6 +23,7 @@ class TasksController < ApplicationController
       redirect_to @task, notice: "タスク「#{@task.title}」を登録しました。"
     else
       render :new
+      @label = Label.new
     end
   end
 
@@ -43,7 +46,7 @@ class TasksController < ApplicationController
   private
 
   def task_params
-    params.require(:task).permit(:title, :description, :important, :status, :deadline_date)
+    params.require(:task).permit(:title, :description, :important, :status, :deadline_date, { label_ids: [] })
   end
 
   def search_params
