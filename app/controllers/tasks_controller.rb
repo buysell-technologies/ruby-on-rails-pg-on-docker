@@ -3,7 +3,7 @@ class TasksController < ApplicationController
     keywords = params.dig(:q, :keywords_cont_all)&.split(/[[:space:]]/)
     params[:q][:keywords_cont_all] = keywords if keywords
     @q = current_user.tasks.ransack(params[:q])
-    @tasks = @q.result(distinct: true).page(params[:page])
+    @tasks = @q.result.includes(:labels, :task_labels).page(params[:page])
   end
 
   def show
