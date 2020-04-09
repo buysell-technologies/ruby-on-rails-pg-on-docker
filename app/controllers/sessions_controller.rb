@@ -5,7 +5,7 @@ class SessionsController < ApplicationController
     if login(email, password)
       render json: {status: 'SUCCESS', data: @user.token}
     else
-      render json: {status: 'ERROR', data: @user.errors}
+      render json: {status: 'User is not exist'}, status: 400
     end
   end
 

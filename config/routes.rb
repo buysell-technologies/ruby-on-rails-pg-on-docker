@@ -15,5 +15,4 @@ Rails.application.routes.draw do
   end
 
   # このルートはいらないもしくは管理ユーザーに絞ったほうがいいかも
-  resources :labels, only: [:show, :create, :update,:destroy]
 end
