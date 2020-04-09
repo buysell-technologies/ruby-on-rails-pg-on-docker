@@ -13,3 +13,5 @@
         {name: name, email: email, password: pass, password_confirmation: pass}
     )
 end
+
+['食事', '勉強', '会議', '買い物'].each { |name| Label.create!(name: name) }
