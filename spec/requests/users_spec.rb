@@ -42,12 +42,9 @@ describe 'Userへのリクエスト.', type: :request do
             # メールアドレスの形式が不正
             @user_params = {name: 'test user',email: 'xxxxxxxxxxxxxxxxxxxx',password: 'password'}
         end
-        it 'サインアップに失敗．ステータスコード400を返す．' do
+        it 'サインアップに失敗．' do
             post "/signup" , params: @user_params.to_json, headers: @headers
             expect(response.status).to eq(400)
-        end
-        it 'サインアップに失敗．エラーメッセージを確認' do
-            post "/signup" , params: @user_params.to_json, headers: @headers
             expect(JSON.parse(response.body)["data"]).to eq("email"=>["is invalid"])
         end
         it '存在しないユーザのためログインに失敗．ステータスコード400を返す' do

@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 describe 'Taskモデル', type: :request do
+    # すでにサインアップとログイン済みでトークンは発行済とする
     before do
         @headers = {"Content-Type" => 'application/json'}
         @user = FactoryBot.create(:user)
@@ -95,5 +96,81 @@ describe 'Taskモデル', type: :request do
         end
     end
 
-    # トークン所持済みで他のユーザーのタスクへアクセスしようとする場合
+    # ラベル関連
+    context "タスク所持ユーザー本人によるラベル操作" do
+        it "あるタスクのラベル一覧を取得" do
+            @headers["Authorization"] = "Token " + @user.token
+            # ユーザのタスク作成
+            @task = FactoryBot.create(:task, user: @user)
+            # 付与するラベルの作成とDBへの保存
+            @labels = FactoryBot.create_list(:label, 5)
+            for @label in @labels do
+                @task.add_label(@label)
+            end
+            get "/tasks/#{@task.id}/labels",headers: @headers
+            expect(response.status).to eq(200)
+            expect(JSON.parse(response.body)["data"].length).to eq(5)
+        end
+        it "あるタスクにラベルを付与" do
+            @headers["Authorization"] = "Token " + @user.token
+            # ユーザのタスク作成
+            @task = FactoryBot.create(:task, user: @user)
+            # 付与するラベルの作成
+            label_params = {
+                "name":"update label"
+            }
+            post "/tasks/#{@task.id}/add_label", params: label_params.to_json, headers: @headers
+            expect(response.status).to eq(200)
+        end
+        it "あるタスクにラベルの削除" do
+            @headers["Authorization"] = "Token " + @user.token
+            # ユーザのタスク作成
+            @task = FactoryBot.create(:task, user: @user)
+            # ラベルの作成とタスクへの付与
+            @label = FactoryBot.create(:label)
+            @task.add_label(@label)
+            delete "/tasks/#{@task.id}/delete_label/#{@label.id}", headers: @headers
+            expect(response.status).to eq(200)
+        end
+    end
+
+    context "他ユーザによるラベル操作" do
+        it "あるタスクのラベル一覧を取得しようとし失敗" do
+            @another_user = FactoryBot.create(:user)
+            @headers["Authorization"] = "Token " + @another_user.token
+            # ユーザのタスク作成
+            @task = FactoryBot.create(:task, user: @user)
+            # 付与するラベルの作成とDBへの保存
+            @labels = FactoryBot.create_list(:label, 5)
+            for @label in @labels do
+                @task.add_label(@label)
+            end
+            # another_userとしてuserのラベル一覧を取得しようとする
+            get "/tasks/#{@task.id}/labels",headers: @headers
+            expect(response.status).to eq(403)
+        end
+        it "他ユーザのタスクにラベルを付与して失敗" do
+            @another_user = FactoryBot.create(:user)
+            @headers["Authorization"] = "Token " + @another_user.token
+            # ユーザのタスク作成
+            @task = FactoryBot.create(:task, user: @user)
+            # 付与するラベルの作成
+            label_params = {
+                "name":"update label"
+            }
+            post "/tasks/#{@task.id}/add_label", params: label_params.to_json, headers: @headers
+            expect(response.status).to eq(403)
+        end
+        it "他ユーザのタスクを削除しようとして失敗" do
+            @another_user = FactoryBot.create(:user)
+            @headers["Authorization"] = "Token " + @another_user.token
+            # ユーザのタスク作成
+            @task = FactoryBot.create(:task, user: @user)
+            # ラベルの作成とタスクへの付与
+            @label = FactoryBot.create(:label)
+            @task.add_label(@label)
+            delete "/tasks/#{@task.id}/delete_label/#{@label.id}", headers: @headers
+            expect(response.status).to eq(403)
+        end
+    end
 end

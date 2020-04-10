@@ -1,5 +1,5 @@
 FactoryBot.define do
     factory :label do
-        name {'test label'}
+        sequence(:name) {|n| "label #{n}"}
     end
 end
