@@ -35,7 +35,7 @@ class TasksController < ApplicationController
   
     def destroy
         @task.destroy
-        render json: { status: 'SUCCESS', message: 'Deleted task', data: @task }
+        render json: { status: 'SUCCESS', message: 'Deleted task'}
     end
 
     def labels
@@ -66,7 +66,7 @@ class TasksController < ApplicationController
         if @auth_user.id == @task.user_id
             true
         else
-            render json: { status: 'ERROR', message: 'Please login by currect user'}
+            render json: { status: 'ERROR', message: 'Please login by currect user'}, status: 403
         end
     end
 end

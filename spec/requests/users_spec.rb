@@ -16,7 +16,6 @@ describe 'Userへのリクエスト.', type: :request do
         end
         it 'ログインに成功するとステータスコード200を返す．' do
             user = FactoryBot.create(:user)
-            puts user
             post "/login" , params: {email: user.email, password: user.password}.to_json, headers: @headers
             expect(response.status).to eq(200)
         end
