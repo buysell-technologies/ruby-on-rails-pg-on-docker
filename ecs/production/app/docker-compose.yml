@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+  app:
+    image: [813281301262.dkr.ecr.us-east-2.amazonaws.com/task-management]
+    entrypoint: bundle exec unicorn -c config/unicorn.rb
+    env_file:
+      - ../env
+    working_dir: /projects/rails-sample
+    logging:
+      driver: "awslogs"
+      options:
+        awslogs-region: "ap-northeast-1"
+        awslogs-group: "rails-sample-production/app"
+        awslogs-stream-prefix: "rails-sample-app"
+  nginx:
+    image: [ECRのリポジトリURI]
+    ports:
+      - 0:80
+    links:
+      - "app:app"
+    env_file:
+      - ../env
+    working_dir: /projects/rails-sample
+    logging:
+      driver: "awslogs"
+      options:
+        awslogs-region: "ap-northeast-1"
+        awslogs-group: "rails-sample-production/nginx"
+        awslogs-stream-prefix: "rails-sample-nginx"
