@@ -42,7 +42,11 @@ jobs:
       - run:
           name: RSpec を実行
           command: |
-            bundle exec rspec 
+            docker exec rails-sample-app-build:latest bundle exec rspec --profile 10 \
+            --format RspecJunitFormatter \
+            --out test_results/rspec.xml \
+            --format progress \
+            $(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
       # タイミング解析のテスト結果を保存します
       - store_test_results: # テストサマリー (https://circleci.com/docs/ja/2.0/collect-test-data/) に表示するテスト結果をアップロードします
           path: test_results
