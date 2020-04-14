@@ -41,6 +41,7 @@ group :development, :test do
   gem 'factory_bot'
   gem 'rspec-rails'
   gem 'rubocop', '~> 0.81.0', require: false
+  gem 'rspec_junit_formatter'
 end
 
 group :development do

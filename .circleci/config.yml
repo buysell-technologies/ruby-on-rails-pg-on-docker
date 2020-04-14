@@ -1,87 +1,55 @@
 version: 2.1
-jobs: # ステップの集合
-  build: # Workflows を使用しない実行では、エントリポイントとして `build` ジョブが必要
-    parallelism: 3 # このジョブのインスタンスを 3つ並列実行します
-    docker: # Docker でステップを実行します
-      - image: circleci/ruby:2.6.2-node-browsers-legacy # このイメージをすべての `steps` が実行されるプライマリコンテナとして使用します
-        environment: # プライマリコンテナの環境変数
+jobs:
+  build:
+    docker:
+      - image: circleci/ruby:2.6.2-stretch-node
+        environment:
+          RAILS_ENV: test
           BUNDLE_JOBS: 3
           BUNDLE_RETRY: 3
           BUNDLE_PATH: vendor/bundle
-          PGHOST: 127.0.0.1
-          PGUSER: circleci-demo-ruby
-          RAILS_ENV: test
-      - image: circleci/postgres:9.5-alpine # データベースイメージ
-        environment: # データベースの環境変数
-          POSTGRES_USER: circleci-demo-ruby
-          POSTGRES_DB: rails_blog
-          POSTGRES_PASSWORD: ""
-    steps: # 実行可能コマンドの集合
-      - checkout # ソースコードを作業ディレクトリにチェックアウトする特別なステップ
-
-      # Bundler のバージョンを指定します
-
+          PG_DATABASE: postgres
+          PG_PASSWORD: pass
+          PG_USER: postgres
+          PG_HOST: 127.0.0.1
+          SELENIUM_DRIVER_URL: http://selenium_chrome:4444/wd/hub
+      - image: circleci/postgres:9.6-postgis-ram
+        environment:
+          POSTGRES_PASSWORD: pass
+          POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --locale=C"
+    parallelism: 3
+    steps:
+      - checkout
       - run:
-          name: Bundler を指定
+          name: Which bundler?
           command: bundle -v
-
-      # バンドルキャッシュを復元します
-      # 依存関係キャッシュについては https://circleci.com/docs/ja/2.0/caching/ をお読みください
-
       - restore_cache:
           keys:
-            - rails-demo-bundle-v2-{{ checksum "Gemfile.lock" }}
-            - rails-demo-bundle-v2-
-
-      - run: # Ruby の依存関係をインストールします
-          name: バンドルインストール
-          command: bundle check || bundle install
-
-      # Ruby の依存関係のバンドルキャッシュを保存します
-
+            - task-management-{{ checksum "Gemfile.lock" }}
+            - task-management-
+      - run:
+          name: Bundle install
+          command: bundle install --jobs=3 --retry=3 --path vendor/bundle
       - save_cache:
-          key: rails-demo-bundle-v2-{{ checksum "Gemfile.lock" }}
+          key: task-management-{{ checksum "Gemfile.lock" }}
           paths:
             - vendor/bundle
-
-      # # アプリケーションで Webpacker または Yarn を他の何らかの方法で使用する場合にのみ必要です
-
-      # - restore_cache:
-      #     keys:
-      #       - rails-demo-yarn-{{ checksum "yarn.lock" }}
-      #       - rails-demo-yarn-
-
-      # - run:
-      #     name: Yarn をインストール
-      #     command: yarn install --cache-folder ~/.cache/yarn
-
-      # # Yarn または Webpacker のキャッシュを保存します
-
-      # - save_cache:
-      #     key: rails-demo-yarn-{{ checksum "yarn.lock" }}
-      #     paths:
-      #       - ~/.cache/yarn
-
       - run:
-          name: DB を待機
+          name: Wait for DB
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
-
       - run:
-          name: データベースをセットアップ
-          command: bin/rails db:schema:load --trace
-
+          name: Create db
+          command: bundle exec rails db:create
       - run:
-          name: RSpec を並列実行
+          name: Database setup
+          command: bundle exec rails db:schema:load --trace
+      - run:
+          name: Run RSpec
           command: |
             bundle exec rspec --profile 10 \
                               --format RspecJunitFormatter \
                               --out test_results/rspec.xml \
                               --format progress \
                               $(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
-
-      # タイミング解析のテスト結果を保存します
-
-      - store_test_results: # テストサマリー (https://circleci.com/docs/ja/2.0/collect-test-data/) に表示するテスト結果をアップロードします
-          # path: test_results
-          path: .
-
+      - store_test_results:
+          path: test_results
