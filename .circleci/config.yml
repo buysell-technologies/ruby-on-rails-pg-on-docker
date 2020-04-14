@@ -60,8 +60,6 @@ jobs:
 workflows:
   build_and_push_image:
     jobs:
-      - request-build_and_push:
-          type: approval
       - aws-ecr/build-and-push-image:
           account-url: AWS_ECR_ACCOUNT_URL
           aws-access-key-id: AWS_ACCESS_KEY_ID
