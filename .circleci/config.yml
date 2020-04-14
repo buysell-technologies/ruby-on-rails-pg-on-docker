@@ -1,116 +1,87 @@
 version: 2.1
-orbs:
-  aws-cli: circleci/aws-cli@0.1.13
-executors:
-  builder:
-    docker:
-      - image: circleci/buildpack-deps
+jobs: # ステップの集合
+  build: # Workflows を使用しない実行では、エントリポイントとして `build` ジョブが必要
+    parallelism: 3 # このジョブのインスタンスを 3つ並列実行します
+    docker: # Docker でステップを実行します
+      - image: circleci/ruby:2.6.2-node-browsers-legacy # このイメージをすべての `steps` が実行されるプライマリコンテナとして使用します
+        environment: # プライマリコンテナの環境変数
+          BUNDLE_JOBS: 3
+          BUNDLE_RETRY: 3
+          BUNDLE_PATH: vendor/bundle
+          PGHOST: 127.0.0.1
+          PGUSER: circleci-demo-ruby
+          RAILS_ENV: test
+      - image: circleci/postgres:9.5-alpine # データベースイメージ
+        environment: # データベースの環境変数
+          POSTGRES_USER: circleci-demo-ruby
+          POSTGRES_DB: rails_blog
+          POSTGRES_PASSWORD: ""
+    steps: # 実行可能コマンドの集合
+      - checkout # ソースコードを作業ディレクトリにチェックアウトする特別なステップ
 
-commands:
-  init:
-    steps:
-      - checkout
-      - aws-cli/install
-      - install_ecs-cli
-      - setup_remote_docker
-  install_ecs-cli:
-    steps:
-      - run:
-          name: Install ECS-CLI
-          command: |
-            sudo curl -o /usr/local/bin/ecs-cli https://amazon-ecs-cli.s3.amazonaws.com/ecs-cli-linux-amd64-latest
-            sudo chmod +x /usr/local/bin/ecs-cli
+      # Bundler のバージョンを指定します
 
-jobs:
-  build:
-    executor: builder
-    steps:
-      - init
       - run:
-          name: Build application Docker image
-          command: |
-            docker build -f Dockerfile --rm=false -t rails-sample-app-build:latest .
-      - run:
-          name: Save image
-          command: |
-            mkdir -p /tmp/docker
-            docker save rails-sample-app-build:latest -o /tmp/docker/image
-      - persist_to_workspace:
-          root: /tmp/docker
+          name: Bundler を指定
+          command: bundle -v
+
+      # バンドルキャッシュを復元します
+      # 依存関係キャッシュについては https://circleci.com/docs/ja/2.0/caching/ をお読みください
+
+      - restore_cache:
+          keys:
+            - rails-demo-bundle-v2-{{ checksum "Gemfile.lock" }}
+            - rails-demo-bundle-v2-
+
+      - run: # Ruby の依存関係をインストールします
+          name: バンドルインストール
+          command: bundle check || bundle install
+
+      # Ruby の依存関係のバンドルキャッシュを保存します
+
+      - save_cache:
+          key: rails-demo-bundle-v2-{{ checksum "Gemfile.lock" }}
           paths:
-            - image
-      - run:
-          name: RSpec を実行
-          command: |
-            docker exec rails-sample-app-build:latest bundle exec rspec --profile 10 \
-            --format RspecJunitFormatter \
-            --out test_results/rspec.xml \
-            --format progress \
-            $(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
-      # タイミング解析のテスト結果を保存します
-      - store_test_results: # テストサマリー (https://circleci.com/docs/ja/2.0/collect-test-data/) に表示するテスト結果をアップロードします
-          path: test_results
-  
-  
-    
-  deploy:
-    executor: builder
-    steps:
-      - init
-      - attach_workspace:
-          at: /tmp/docker
-      - run: docker load -i /tmp/docker/image
-      - run:
-          name: Assets precompile and Push Docker image
-          command: |
-            docker build -f assets.Dockerfile --build-arg RAILS_MASTER_KEY=${RAILS_MASTER_KEY} --rm=false -t rails-sample-app-build:latest .
-      - run:
-          name: Push Docker image
-          command: |
-            ecs-cli push rails-sample-app-build:latest
-      - run:
-          name: ECS Config
-          command: |
-            ecs-cli configure \
-            --cluster rails-sample-${CIRCLE_BRANCH} \
-            --region ${AWS_DEFAULT_REGION} \
-            --config-name rails-sample-${CIRCLE_BRANCH}
-      - run:
-          name: migrate deploy
-          command: |
-            ecs-cli compose \
-            --file ecs/${CIRCLE_BRANCH}/migrate/docker-compose.yml \
-            --ecs-params ecs/${CIRCLE_BRANCH}/migrate/ecs-params.yml \
-            --project-name rails-sample-${CIRCLE_BRANCH}-migrate \
-            up \
-            --launch-type EC2 \
-            --create-log-groups \
-            --cluster-config rails-sample-${CIRCLE_BRANCH}
-      - run:
-          name: Unicorn + Nginx deploy
-          command: |
-            ecs-cli compose \
-            --file ecs/${CIRCLE_BRANCH}/app/docker-compose.yml \
-            --ecs-params ecs/${CIRCLE_BRANCH}/app/ecs-params.yml \
-            --project-name rails-sample-${CIRCLE_BRANCH}-app \
-            service up \
-            --container-name nginx \
-            --container-port 80 \
-            --target-group-arn ${TARGET_GROUP_ARN} \
-            --timeout 0 \
-            --launch-type EC2 \
-            --create-log-groups \
-            --cluster-config rails-sample-${CIRCLE_BRANCH}
+            - vendor/bundle
 
-workflows:
-  version: 2
-  build-deploy:
-    jobs:
-      - build
-      - deploy:
-          requires:
-            - build
-          filters:
-            branches:
-              only:
-                - master
+      # # アプリケーションで Webpacker または Yarn を他の何らかの方法で使用する場合にのみ必要です
+
+      # - restore_cache:
+      #     keys:
+      #       - rails-demo-yarn-{{ checksum "yarn.lock" }}
+      #       - rails-demo-yarn-
+
+      # - run:
+      #     name: Yarn をインストール
+      #     command: yarn install --cache-folder ~/.cache/yarn
+
+      # # Yarn または Webpacker のキャッシュを保存します
+
+      # - save_cache:
+      #     key: rails-demo-yarn-{{ checksum "yarn.lock" }}
+      #     paths:
+      #       - ~/.cache/yarn
+
+      - run:
+          name: DB を待機
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
+
+      - run:
+          name: データベースをセットアップ
+          command: bin/rails db:schema:load --trace
+
+      - run:
+          name: RSpec を並列実行
+          command: |
+            bundle exec rspec --profile 10 \
+                              --format RspecJunitFormatter \
+                              --out test_results/rspec.xml \
+                              --format progress \
+                              $(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
+
+      # タイミング解析のテスト結果を保存します
+
+      - store_test_results: # テストサマリー (https://circleci.com/docs/ja/2.0/collect-test-data/) に表示するテスト結果をアップロードします
+          # path: test_results
+          path: .
+

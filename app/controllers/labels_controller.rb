@@ -13,9 +13,9 @@ class LabelsController < ApplicationController
 
         if @label.save
             render json: {status: "create label",data: @label}
-          else
+        else
             render json: {status:unprocessable_entity,data: @label.errors}
-          end
+        end
     end
 
     # curl -X PUT -H "Content-Type: application/json" -d '{"name":"test label update"}'

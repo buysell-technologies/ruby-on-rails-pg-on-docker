@@ -19,9 +19,9 @@ class TasksController < ApplicationController
 
         if @task.save
             render json: { status: 'SUCCESS', data: @task }
-          else
+        else
             render json: { status: 'ERROR', data: @task.errors }
-          end
+        end
     end
 
     # curl -X PUT -H "Content-Type: application/json" -d '{"name":"test title 200","content":"test content text200","label":"test label","status":0,"deadline":"2020-04-07T00:15:46.020+09:00","priority":2}' http://0.0.0.0/tasks

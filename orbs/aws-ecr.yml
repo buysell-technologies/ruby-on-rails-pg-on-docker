@@ -1,0 +1,394 @@
+# This code is licensed from CircleCI to the user under the MIT license. See
+# https://circleci.com/orbs/registry/licensing for details.
+commands:
+  build-and-push-image:
+    description: |
+      Install AWS CLI, if needed, and configure. Log into Amazon ECR and push image to repository. Requires environment variables for AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY. We recommend these be saved in a Project (https://circleci.com/docs/2.0/env-vars/#setting-an-environment-variable-in-a-project) or in Contexts (https://circleci.com/docs/2.0/contexts).
+    parameters:
+      account-url:
+        default: AWS_ECR_ACCOUNT_URL
+        description: |
+          Env var storing Amazon ECR account URL that maps to an AWS account, e.g. {awsAccountNum}.dkr.ecr.us-west-2.amazonaws.com defaults to AWS_ECR_ACCOUNT_URL
+        type: env_var_name
+      attach-workspace:
+        default: false
+        description: |
+          Boolean for whether or not to attach to an existing workspace. Default is false.
+        type: boolean
+      aws-access-key-id:
+        default: AWS_ACCESS_KEY_ID
+        description: |
+          AWS access key id for IAM role. Set this to the name of the environment variable you will set to hold this value, i.e. AWS_ACCESS_KEY.
+        type: env_var_name
+      aws-secret-access-key:
+        default: AWS_SECRET_ACCESS_KEY
+        description: |
+          AWS secret key for IAM role. Set this to the name of the environment variable you will set to hold this value, i.e. AWS_SECRET_ACCESS_KEY.
+        type: env_var_name
+      checkout:
+        default: true
+        description: |
+          Boolean for whether or not to checkout as a first step. Default is true.
+        type: boolean
+      create-repo:
+        default: false
+        description: Should the repo be created if it does not exist?
+        type: boolean
+      dockerfile:
+        default: Dockerfile
+        description: Name of dockerfile to use. Defaults to Dockerfile.
+        type: string
+      executor:
+        default: default
+        description: executor to use for this job
+        type: executor
+      extra-build-args:
+        default: ""
+        description: |
+          Extra flags to pass to docker build. For examples, see https://docs.docker.com/engine/reference/commandline/build
+        type: string
+      no-output-timeout:
+        default: 10m
+        description: |
+          The amount of time to allow the docker build command to run before timing out (default is `10m`)
+        type: string
+      path:
+        default: .
+        description: Path to the directory containing your Dockerfile and build context.
+          Defaults to . (working directory).
+        type: string
+      profile-name:
+        default: default
+        description: AWS profile name to be configured.
+        type: string
+      region:
+        default: AWS_REGION
+        description: |
+          Name of env var storing your AWS region information, defaults to AWS_REGION
+        type: env_var_name
+      repo:
+        description: Name of an Amazon ECR repository
+        type: string
+      repo-scan-on-push:
+        default: true
+        description: Should the created repo be security scanned on push?
+        type: boolean
+      setup-remote-docker:
+        default: false
+        description: |
+          Setup and use CircleCI's remote Docker environment for Docker and docker-compose commands? Not required if using the default executor
+        type: boolean
+      tag:
+        default: latest
+        description: A comma-separated string containing docker image tags to build
+          and push (default = latest)
+        type: string
+      workspace-root:
+        default: .
+        description: |
+          Workspace root path that is either an absolute path or a path relative to the working directory. Defaults to '.' (the working directory)
+        type: string
+    steps:
+    - when:
+        condition: <<parameters.checkout>>
+        steps:
+        - checkout
+    - aws-cli/install
+    - aws-cli/configure:
+        aws-access-key-id: <<parameters.aws-access-key-id>>
+        aws-region: <<parameters.region>>
+        aws-secret-access-key: <<parameters.aws-secret-access-key>>
+        profile-name: <<parameters.profile-name>>
+    - when:
+        condition: <<parameters.attach-workspace>>
+        steps:
+        - attach_workspace:
+            at: <<parameters.workspace-root>>
+    - when:
+        condition: <<parameters.setup-remote-docker>>
+        steps:
+        - setup_remote_docker
+    - ecr-login:
+        profile-name: <<parameters.profile-name>>
+        region: <<parameters.region>>
+    - build-image:
+        account-url: <<parameters.account-url>>
+        dockerfile: <<parameters.dockerfile>>
+        extra-build-args: <<parameters.extra-build-args>>
+        no-output-timeout: <<parameters.no-output-timeout>>
+        path: <<parameters.path>>
+        repo: <<parameters.repo>>
+        tag: <<parameters.tag>>
+    - when:
+        condition: <<parameters.create-repo>>
+        steps:
+        - run: |
+            aws ecr describe-repositories --profile <<parameters.profile-name>> --region $<<parameters.region>> --repository-names <<parameters.repo>> > /dev/null 2>&1 || \
+            aws ecr create-repository --profile <<parameters.profile-name>> --region $<<parameters.region>> --repository-name <<parameters.repo>> --image-scanning-configuration scanOnPush=<<parameters.repo-scan-on-push>>
+    - push-image:
+        account-url: <<parameters.account-url>>
+        repo: <<parameters.repo>>
+        tag: <<parameters.tag>>
+  build-image:
+    description: Build a docker image
+    parameters:
+      account-url:
+        default: AWS_ECR_ACCOUNT_URL
+        description: |
+          The Amazon ECR account URL that maps to an AWS account, e.g. {awsAccountNum}.dkr.ecr.us-west-2.amazonaws.com
+        type: env_var_name
+      dockerfile:
+        default: Dockerfile
+        description: Name of dockerfile to use. Defaults to Dockerfile.
+        type: string
+      extra-build-args:
+        default: ""
+        description: |
+          Extra flags to pass to docker build. For examples, see https://docs.docker.com/engine/reference/commandline/build
+        type: string
+      no-output-timeout:
+        default: 10m
+        description: The amount of time to allow the docker command to run before
+          timing out.
+        type: string
+      path:
+        default: .
+        description: Path to the directory containing your Dockerfile and build context.
+          Defaults to . (working directory).
+        type: string
+      repo:
+        description: Name of an Amazon ECR repository
+        type: string
+      tag:
+        default: latest
+        description: A comma-separated string containing docker image tags (default
+          = latest)
+        type: string
+    steps:
+    - run:
+        command: |
+          docker_tag_args=""
+          IFS="," read -ra DOCKER_TAGS \<<< "<< parameters.tag >>"
+          for tag in "${DOCKER_TAGS[@]}"; do
+            docker_tag_args="$docker_tag_args -t $<<parameters.account-url>>/<<parameters.repo>>:$tag"
+          done
+          docker build \
+            <<#parameters.extra-build-args>><<parameters.extra-build-args>><</parameters.extra-build-args>> \
+            -f <<parameters.path>>/<<parameters.dockerfile>> \
+            $docker_tag_args \
+            <<parameters.path>>
+        name: Build docker image
+        no_output_timeout: <<parameters.no-output-timeout>>
+  ecr-login:
+    description: Authenticate into the Amazon ECR service
+    parameters:
+      profile-name:
+        default: default
+        description: |
+          AWS profile name to be configured. defaults to "default"
+        type: string
+      region:
+        default: AWS_REGION
+        description: |
+          Name of env var storing your AWS region information, defaults to AWS_REGION
+        type: env_var_name
+    steps:
+    - run:
+        command: |
+          # aws ecr get-login returns a login command w/ a temp token
+          LOGIN_COMMAND=$(aws ecr get-login --no-include-email --region $<<parameters.region>> --profile <<parameters.profile-name>>)
+
+          # save it to an env var & use that env var to login
+          $LOGIN_COMMAND
+        name: Log into Amazon ECR
+  ecr-login-for-secondary-account:
+    description: Authenticate into the Amazon ECR service
+    parameters:
+      account-id:
+        default: AWS_ECR_REPO_ACCOUNT_ID
+        description: |
+          Name of environment variable storing the Amazon ECR repository's account ID
+        type: env_var_name
+      profile-name:
+        default: default
+        description: |
+          AWS profile name to be configured. defaults to "default"
+        type: string
+      region:
+        default: AWS_REGION
+        description: |
+          Name of environment variable storing AWS region information, defaults to AWS_REGION
+        type: env_var_name
+    steps:
+    - run:
+        command: |
+          # aws ecr get-login returns a login command w/ a temp token
+          LOGIN_COMMAND=$(aws ecr get-login --no-include-email --region $<<parameters.region>> --registry-ids $<<parameters.account-id>> --profile <<parameters.profile-name>>)
+
+          # save it to an env var & use that env var to login
+          $LOGIN_COMMAND
+        name: Log into Amazon ECR
+  push-image:
+    description: Push a container image to the Amazon ECR registry
+    parameters:
+      account-url:
+        default: AWS_ECR_ACCOUNT_URL
+        description: |
+          Env var storing Amazon ECR account URL that maps to an AWS account, e.g. {awsAccountNum}.dkr.ecr.us-west-2.amazonaws.com defaults to AWS_ECR_ACCOUNT_URL
+        type: env_var_name
+      repo:
+        description: Name of an Amazon ECR repository
+        type: string
+      tag:
+        default: latest
+        description: A comma-separated string containing docker image tags (default
+          = latest)
+        type: string
+    steps:
+    - run:
+        command: |
+          IFS="," read -ra DOCKER_TAGS \<<< "<< parameters.tag >>"
+          for tag in "${DOCKER_TAGS[@]}"; do
+            docker push $<<parameters.account-url>>/<<parameters.repo>>:${tag}
+          done
+        name: Push image to Amazon ECR
+description: |
+  Build images and push them to the Amazon Elastic Container Registry.
+display:
+  source_url: https://github.com/CircleCI-Public/aws-ecr-orb
+examples:
+  simple-build-and-push:
+    description: Log into AWS, build and push image to Amazon ECR
+    usage:
+      orbs:
+        aws-ecr: circleci/aws-ecr@x.y.z
+      version: 2.1
+      workflows:
+        build_and_push_image:
+          jobs:
+          - aws-ecr/build-and-push-image:
+              account-url: AWS_ECR_ACCOUNT_URL_ENV_VAR_NAME
+              aws-access-key-id: ACCESS_KEY_ID_ENV_VAR_NAME
+              aws-secret-access-key: SECRET_ACCESS_KEY_ENV_VAR_NAME
+              context: myContext
+              create-repo: true
+              dockerfile: myDockerfile
+              path: pathToMyDockerfile
+              profile-name: myProfileName
+              region: AWS_REGION_ENV_VAR_NAME
+              repo: myECRRepository
+              tag: latest,myECRRepoTag
+executors:
+  default:
+    description: |
+      CircleCI's Ubuntu-based machine executor VM: https://circleci.com/docs/2.0/executor-types/#using-machine
+    machine:
+      docker_layer_caching: <<parameters.use-docker-layer-caching>>
+      image: <<parameters.image>>
+    parameters:
+      image:
+        default: ubuntu-1604:201903-01
+        type: string
+      use-docker-layer-caching:
+        default: false
+        type: boolean
+jobs:
+  build-and-push-image:
+    description: |
+      Install AWS CLI, if needed, and configure. Log into Amazon ECR and push image to repository. Requires environment variables for AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY. We recommend these be saved in a Project (https://circleci.com/docs/2.0/env-vars/#setting-an-environment-variable-in-a-project) or in Contexts (https://circleci.com/docs/2.0/contexts).
+    executor: <<parameters.executor>>
+    parameters:
+      account-url:
+        default: AWS_ECR_ACCOUNT_URL
+        description: |
+          Env var storing Amazon ECR account URL that maps to an AWS account, e.g. {awsAccountNum}.dkr.ecr.us-west-2.amazonaws.com defaults to AWS_ECR_ACCOUNT_URL
+        type: env_var_name
+      attach-workspace:
+        default: false
+        description: |
+          Boolean for whether or not to attach to an existing workspace. Default is false.
+        type: boolean
+      aws-access-key-id:
+        default: AWS_ACCESS_KEY_ID
+        description: |
+          AWS access key id for IAM role. Set this to the name of the environment variable you will set to hold this value, i.e. AWS_ACCESS_KEY.
+        type: env_var_name
+      aws-secret-access-key:
+        default: AWS_SECRET_ACCESS_KEY
+        description: |
+          AWS secret key for IAM role. Set this to the name of the environment variable you will set to hold this value, i.e. AWS_SECRET_ACCESS_KEY.
+        type: env_var_name
+      checkout:
+        default: true
+        description: |
+          Boolean for whether or not to checkout as a first step. Default is true.
+        type: boolean
+      create-repo:
+        default: false
+        description: Should the repo be created if it does not exist?
+        type: boolean
+      dockerfile:
+        default: Dockerfile
+        description: Name of dockerfile to use. Defaults to Dockerfile.
+        type: string
+      executor:
+        default: default
+        description: executor to use for this job
+        type: executor
+      extra-build-args:
+        default: ""
+        description: |
+          Extra flags to pass to docker build. For examples, see https://docs.docker.com/engine/reference/commandline/build
+        type: string
+      path:
+        default: .
+        description: Path to the directory containing your Dockerfile and build context.
+          Defaults to . (working directory).
+        type: string
+      profile-name:
+        default: default
+        description: AWS profile name to be configured.
+        type: string
+      region:
+        default: AWS_REGION
+        description: |
+          Name of env var storing your AWS region information, defaults to AWS_REGION
+        type: env_var_name
+      repo:
+        description: Name of an Amazon ECR repository
+        type: string
+      setup-remote-docker:
+        default: false
+        description: |
+          Setup and use CircleCI's remote Docker environment for Docker and docker-compose commands? Not required if using the default executor
+        type: boolean
+      tag:
+        default: latest
+        description: A comma-separated string containing docker image tags to build
+          and push (default = latest)
+        type: string
+      workspace-root:
+        default: .
+        description: |
+          Workspace root path that is either an absolute path or a path relative to the working directory. Defaults to '.' (the working directory)
+        type: string
+    steps:
+    - build-and-push-image:
+        account-url: <<parameters.account-url>>
+        attach-workspace: <<parameters.attach-workspace>>
+        aws-access-key-id: <<parameters.aws-access-key-id>>
+        aws-secret-access-key: <<parameters.aws-secret-access-key>>
+        checkout: <<parameters.checkout>>
+        create-repo: <<parameters.create-repo>>
+        dockerfile: <<parameters.dockerfile>>
+        extra-build-args: <<parameters.extra-build-args>>
+        path: <<parameters.path>>
+        profile-name: <<parameters.profile-name>>
+        region: <<parameters.region>>
+        repo: <<parameters.repo>>
+        setup-remote-docker: <<parameters.setup-remote-docker>>
+        tag: <<parameters.tag>>
+        workspace-root: <<parameters.workspace-root>>
+orbs:
+  aws-cli: circleci/aws-cli@0.1.13
+version: 2.1
