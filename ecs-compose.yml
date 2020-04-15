@@ -10,6 +10,7 @@ services:
       POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --locale=C"
     container_name: db
   app:
+    image: 813281301262.dkr.ecr.us-east-2.amazonaws.com/tomizawa-train:db65f6b4ff2664463e39ebe7d4c5aff6a3dfcd31
     build:
       context: .
     volumes:

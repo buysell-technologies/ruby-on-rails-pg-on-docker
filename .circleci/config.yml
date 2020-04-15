@@ -1,0 +1,76 @@
+version: 2.1
+orbs:
+  aws-ecr: circleci/aws-ecr@6.8.1
+  aws-ecs: circleci/aws-ecs@1.1.0
+
+jobs:
+  build:
+    docker:
+      - image: circleci/ruby:2.6.2-stretch-node
+        environment:
+          RAILS_ENV: test
+          BUNDLE_JOBS: 3
+          BUNDLE_RETRY: 3
+          BUNDLE_PATH: vendor/bundle
+          PG_DATABASE: postgres
+          PG_PASSWORD: pass
+          PG_USER: postgres
+          PG_HOST: 127.0.0.1
+          SELENIUM_DRIVER_URL: http://selenium_chrome:4444/wd/hub
+      - image: circleci/postgres:9.6-postgis-ram
+        environment:
+          POSTGRES_PASSWORD: pass
+          POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --locale=C"
+    parallelism: 3
+    steps:
+      - checkout
+      - run:
+          name: Which bundler?
+          command: bundle -v
+      - restore_cache:
+          keys:
+            - task-management-{{ checksum "Gemfile.lock" }}
+            - task-management-
+      - run:
+          name: Bundle install
+          command: bundle install --jobs=3 --retry=3 --path vendor/bundle
+      - save_cache:
+          key: task-management-{{ checksum "Gemfile.lock" }}
+          paths:
+            - vendor/bundle
+      - run:
+          name: Wait for DB
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
+      - run:
+          name: Create db
+          command: bundle exec rails db:create
+      - run:
+          name: Database setup
+          command: bundle exec rails db:schema:load --trace
+      - run:
+          name: Run RSpec
+          command: |
+            bundle exec rspec --profile 10 \
+                              --format RspecJunitFormatter \
+                              --out test_results/rspec.xml \
+                              --format progress \
+                              $(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
+      - store_test_results:
+          path: test_results
+
+workflows:
+  build-and-push-image:
+    jobs:
+      - aws-ecr/build-and-push-image:
+          account-url: AWS_ECR_ACCOUNT_URL
+          aws-access-key-id: AWS_ACCESS_KEY_ID
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+          repo: ${MY_APP_PREFIX}
+          region: AWS_REGION
+          tag: ${CIRCLE_SHA1}
+      - aws-ecs/deploy-service-update:
+          requires:
+            - aws-ecr/build-and-push-image
+          family: '${MY_APP_PREFIX}-service'
+          cluster-name: '${MY_APP_PREFIX}-cluster'
+          container-image-name-updates: 'container=${MY_APP_PREFIX}-service,tag=${CIRCLE_SHA1}'
