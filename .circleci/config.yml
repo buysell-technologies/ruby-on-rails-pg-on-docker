@@ -68,9 +68,9 @@ workflows:
           repo: ${MY_APP_PREFIX}
           region: AWS_REGION
           tag: ${CIRCLE_SHA1}
-      # - aws-ecs/deploy-service-update:
-      #     requires:
-      #       - aws-ecr/build-and-push-image
-      #     family: '${MY_APP_PREFIX}-service'
-      #     cluster-name: '${MY_APP_PREFIX}-cluster'
-      #     container-image-name-updates: 'container=${MY_APP_PREFIX}-service,tag=${CIRCLE_SHA1}'
+      - aws-ecs/deploy-service-update:
+          requires:
+            - aws-ecr/build-and-push-image
+          family: '${MY_APP_PREFIX}-service'
+          cluster-name: '${MY_APP_PREFIX}-cluster'
+          container-image-name-updates: 'container=${MY_APP_PREFIX}-service,tag=${CIRCLE_SHA1}'
