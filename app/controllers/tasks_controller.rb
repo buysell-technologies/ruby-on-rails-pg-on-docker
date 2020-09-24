@@ -21,15 +21,19 @@ class TasksController < ApplicationController
       flash[:notice] = "タスクを登録しました。"
       redirect_to tasks_path
     else
-      flash[:alert] = "タスクの登録失敗しました。"
+      flash[:alert] = "タスクの登録が失敗しました。"
       redirect_to tasks_new_path
     end
   end
 
   def update
     @task = Task.find(params[:id])
-    task.update!(task_params)
-    redirect_to tasks_path
+    if @task.update(task_params)
+      redirect_to tasks_path
+      flash[:notice] = "タスクを変更しました。"
+    else
+      flash[:alert] = "タスクの変更失敗しました。"
+    end
   end
   
 
