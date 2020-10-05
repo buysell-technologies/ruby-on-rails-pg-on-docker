@@ -15,6 +15,12 @@ class TasksController < ApplicationController
     @task = Task.find(params[:id])
   end
 
+  def search
+    @q = Task.ransack(params[:q])
+    @searchs = @q.result(distinct: true)
+  end
+  
+
   def create
     @task = Task.new(task_params)
     if @task.save

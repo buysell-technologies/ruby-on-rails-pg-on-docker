@@ -3,9 +3,12 @@ ja:
     models:
       task: タスク
     attributes:
-      task:
-        title: タイトル 
-        text: 詳細
-        created_at: 作成日 
-        status: 期限
+      enums:
+        task:
+          title: タイトル 
+          text: 詳細
+          created_at: 作成日 
+          status: 期限
+          
+          
         

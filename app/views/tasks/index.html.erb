@@ -1,14 +1,15 @@
-<h1>Tasks#index</h1>
-<p>Find me in app/views/tasks/index.html.erb</p>
-
+<h1>Tasks list</h1>
+<%= link_to "登録", new_task_path %><br>
+<%= link_to "タスク検索", tasks_search_path %><br>
 
 <% @tasks.each do |task| %>
    タイトル<%= task.title %><br>
    内容：<%= task.text %><br>
    作成日:<%= task.created_at %><br>
    期限:<%= task.deadline %><br>
+   状態:<%= task.status %><br>
    <%= link_to "詳細", task_path(task.id) %>
    <%= link_to "削除", task_path(task.id), method: :delete %><br><br>
 <% end %>
 
-<%= link_to "登録", new_task_path %>
+
