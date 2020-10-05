@@ -10,7 +10,7 @@
       <%= f.text_field :deadline %><br>
 
       <p>タスクの進捗</p>
-      <%= f.select :status, ["yet","doing","complete"], include_blank: "選択してください" %>
+      <%= f.select :status, Task.statuses.keys.map {|k| [Task.statuses_i18n[k],k]} %>
 
       <%= f.submit "作成する" %>
 

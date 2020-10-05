@@ -7,4 +7,5 @@ class Task < ApplicationRecord
         doing: 1,
         complete: 2
     }
+
 end
