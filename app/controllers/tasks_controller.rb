@@ -1,6 +1,7 @@
 class TasksController < ApplicationController
   def index
-    @tasks = Task.all.order('deadline ASC')
+    @q = Task.ransack(params[:q])
+    @tasks = @q.result(distinct: true)
   end
 
   def show
@@ -16,8 +17,6 @@ class TasksController < ApplicationController
   end
 
   def search_title
-    @q = Task.ransack(params[:q])
-    @searchs = @q.result(distinct: true)
   end
 
   def search_status
