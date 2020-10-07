@@ -7,6 +7,7 @@
    <%= f.submit "検索" %>
 <% end %><br>
 
+<%= sort_link(@q, :deadline, "期限") %><br>
 <%= sort_link(@q, :status, "進捗") %><br>
 
 <% @tasks.each do |task| %>
