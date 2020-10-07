@@ -7,8 +7,18 @@
    <%= f.submit "検索" %>
 <% end %><br>
 
+
+<%= search_form_for @q do |f| %>
+   <%= f.label :status, 'ステータス' %>
+   <%= f.radio_button :status_eq, 0 %>未着手
+   <%= f.radio_button :status_eq, 1 %>着手
+   <%= f.radio_button :status_eq, 2 %>完了
+   <%= f.submit "検索" %>
+<% end %><br>
+
+
+
 <%= sort_link(@q, :deadline, "期限") %><br>
-<%= sort_link(@q, :status, "進捗") %><br>
 
 <% @tasks.each do |task| %>
    タイトル<%= task.title %><br>
