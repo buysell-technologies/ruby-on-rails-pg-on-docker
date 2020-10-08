@@ -14,17 +14,8 @@ class TasksController < ApplicationController
 
   def edit
     @task = Task.find(params[:id])
-  end
+  end 
 
-  def search_title
-  end
-
-  def search_status
-    @q = Task.ransack(params[:q])
-    @searchs = @q.result(distinct: true)
-  end
-  
-  
 
   def create
     @task = Task.new(task_params)

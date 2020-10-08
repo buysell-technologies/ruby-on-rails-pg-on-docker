@@ -5,3 +5,7 @@ ja:
         yet: "未着手"
         doing: "着手"
         complete: "完了"
+      priority:
+        High: "高"
+        middle: "中"
+        low: "低" 
