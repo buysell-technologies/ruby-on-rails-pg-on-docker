@@ -1,7 +1,6 @@
 class TasksController < ApplicationController
   def index
-    @q = Task.ransack(params[:q])
-    @tasks = @q.result(distinct: true)
+    @tasks = Task.all
   end
 
   def show
@@ -16,6 +15,21 @@ class TasksController < ApplicationController
     @task = Task.find(params[:id])
   end 
 
+  def search_title
+    if params[:title].present?
+      @tasks = Task.where('title LIKE ?', "%#{params[:title]}%")
+    else
+      @tasks = Task.none
+    end
+  end
+
+  def search_status
+    if params[:status].present?
+      @tasks = Task.where('cast(status as text) LIKE ?', "%#{params[:status]}%")
+    else
+      @tasks = Task.none
+    end
+  end
 
   def create
     @task = Task.new(task_params)

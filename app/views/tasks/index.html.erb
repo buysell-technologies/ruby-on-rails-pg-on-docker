@@ -1,24 +1,15 @@
 <h1>Tasks list</h1>
 <%= link_to "登録", new_task_path %><br>
 
-<%= search_form_for @q do |f| %>
-   <%= f.label :title_cont, "タイトル" %>
-   <%= f.search_field :title_cont %>
-   <%= f.submit "検索" %>
+<%= form_with url: search_title_path, method: :get, local: true do |f|%>
+  <%= f.text_field :title %>
+  <%= f.submit :search %>
+<% end %>
+
+<%= form_tag(search_status_path, method: :get) do |f|%>
+   <%= select_tag(:status, options_for_select([["未着手","0"],["着手","1"],["完了","2"]])) %>
+   <%= submit_tag "絞り込み" %>
 <% end %><br>
-
-
-<%= search_form_for @q do |f| %>
-   <%= f.label :status, 'ステータス' %>
-   <%= f.radio_button :status_eq, 0 %>未着手
-   <%= f.radio_button :status_eq, 1 %>着手
-   <%= f.radio_button :status_eq, 2 %>完了
-   <%= f.submit "検索" %>
-<% end %><br>
-
-
-<%= sort_link(@q, :deadline, "期限") %><br>
-<%= sort_link(@q, :status, "進捗") %><br>
 
 
 <% @tasks.each do |task| %>
