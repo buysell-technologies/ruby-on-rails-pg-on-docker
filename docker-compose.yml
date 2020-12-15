@@ -1,13 +1,15 @@
 version: '3'
 services:
   db:
-    image: postgres:9.6-alpine
+    image: postgres:11.6-alpine
     restart: always
     volumes:
       - ./containers/db:/docker-entrypoint-initdb.d
     environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
       POSTGRES_PASSWORD: pass
       POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --locale=C"
+      TZ: Asia/Tokyo
     container_name: db
   app:
     build:
@@ -21,7 +23,6 @@ services:
       PG_DATABASE: postgres
       PG_PASSWORD: pass
       PG_USER: postgres
-      SELENIUM_DRIVER_URL: http://selenium_chrome:4444/wd/hub
     links:
       - db
       - node
@@ -37,8 +38,6 @@ services:
       driver: "json-file"
       options:
         max-size: "100k"
-    dns:
-      - 8.8.8.8
   node:
     build: frontend
     working_dir: /var/src/app/frontend
@@ -47,10 +46,5 @@ services:
       - /var/src/app/frontend/node_modules
     ports:
       - 9090:8080
-    command: ./node_modules/.bin/webpack-dev-server --host 0.0.0.0 --inline --progress --config build/webpack.dev.conf.js
+    command: ./node_modules/.bin/webpack-dev-server --host 0.0.0.0 --inline --progress --public 0.0.0.0:9090 --config build/webpack.dev.conf.js
     container_name: node
-  selenium_chrome:
-    image: selenium/standalone-chrome-debug
-    logging:
-      driver: none
-    container_name: selenium_chrome

@@ -10,9 +10,14 @@ module.exports = {
         path: __dirname,
         filename: "bundle.js"
     },
+    mode: 'development',
     module: {
-        loaders: [
+        rules: [
             { test: /\.css$/, loader: "style!css" }
         ]
-    }
+    },
+    devServer: {
+        contentBase: 'dist',
+        disableHostCheck: true
+    },
 };

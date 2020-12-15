@@ -62,10 +62,38 @@ docker-composeコマンドを使い、複数コンテナをbuild〜起動して�
 $ docker-compose build
 Successfully built.
 ```
+ここでのbuildはrailsをinstallして`rails new`できるようにするため
 
 ## Generation packages by rails new
+
+### Using view template
 ```
-$ docker-compose run --rm app rails new . -d postgresql --skip-bundle --skip-turbolinks --skip-test --skip
+$ docker-compose run --rm app bundle exec rails new . -d postgresql --skip-bundle --skip-turbolinks
+```
+
+### Using SPA
+```
+$ docker-compose run --rm app bundle exec rails new . -d postgresql --skip-javascript --skip-turbolinks --skip-bundle
+```
+
+`--skip-bundle`しているのは、このあと再buildするときに走るbundle installと処理が重複するため
+
+### dialogue
+```
+Overwrite /var/src/app/README.md? (enter "h" for help) [Ynaqdhm]
+```
+と聞かれるので、 `n` でReturn
+```
+Overwrite /var/src/app/Gemfile? (enter "h" for help) [Ynaqdhm]
+```
+と聞かれるので、 `Y` でReturn
+
+ここまでで初期パッケージ群が装備される
+- *appコンテナにbootsnap等がbundle installが実行されていないと、docker-composeの起動コマンドが動かない*
+
+なので再度
+```
+$ docker-compose build
 ```
 
 ## 起動
@@ -87,6 +115,7 @@ password: <%= ENV['PG_PASSWORD'] %>
 host: db
 ```
 を追加修正
+
 ** postgresのdockerイメージは起動時に初期DBや初期ユーザをよしなに作成してくれることを留意しておく **
 
 [postgresイメージに渡せる環境変数の参照](https://hub.docker.com/_/postgres)

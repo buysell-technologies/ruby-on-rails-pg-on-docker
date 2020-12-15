@@ -1,1 +1,1 @@
-document.write("Milmo works.");
+document.write("Entry works.");
