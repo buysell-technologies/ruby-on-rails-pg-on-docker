@@ -1,3 +1,10 @@
+# このアプリケーションについて
+## 画面設計
+Googleドライブより
+https://drive.google.com/file/d/1vYhzFwIWhX5mseK_ycKz6x7JzyQhElJJ/view?usp=sharing
+## モデル図
+
+
 # Ruby on Rails on Docker
 
 ## Ruby version
