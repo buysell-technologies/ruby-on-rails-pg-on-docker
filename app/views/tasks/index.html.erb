@@ -2,8 +2,23 @@
     <div class="row">
         <div class="col">
         </div>
-        <div class="col-8">
-            <p>bootstrapのテスト</p>
+        <div class="col-10">
+            <table class="mt-5 table table-hover" >
+                <thead>
+                    <tr>
+                        <th scope="col">naem</th>
+                        <th scope="col">detail</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% @tasks.each do |t| %>
+                        <tr>
+                            <th scope="row"><%= link_to "#{t.name}", "/tasks/#{t.id}" %></th>
+                            <td><%= link_to "#{t.detail}", "/tasks/#{t.id}" %></td>
+                        </tr>
+                    <% end %>
+                </tbody>
+            </table>
         </div>
         <div class="col">
         </div>
