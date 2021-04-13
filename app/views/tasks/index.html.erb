@@ -3,22 +3,30 @@
         <div class="col">
         </div>
         <div class="col-10">
-            <table class="mt-5 table table-hover" >
-                <thead>
-                    <tr>
-                        <th scope="col">naem</th>
-                        <th scope="col">detail</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% @tasks.each do |t| %>
-                        <tr>
-                            <th scope="row"><%= link_to "#{t.name}", "/tasks/#{t.id}" %></th>
-                            <td><%= link_to "#{t.detail}", "/tasks/#{t.id}" %></td>
-                        </tr>
+            <div class="mt-5 list-group list-group-flush">
+                <div class="list-group-item">
+                    <div class="row">
+                        <div class="col">
+                            naem
+                        </div>
+                        <div class="col">
+                            detail
+                        </div>
+                    </div>
+                </div>
+                <% @tasks.each do |t| %>
+                    <%= link_to "/tasks/#{t.id}", class: "list-group-item list-group-item-action" do %>
+                        <div class="row">
+                            <div class="col">
+                                <%= t.name %>
+                            </div>
+                            <div class="col">
+                                <%= t.detail %>
+                            </div>
+                        </div>
                     <% end %>
-                </tbody>
-            </table>
+                <% end %>
+            </div>
         </div>
         <div class="col">
         </div>
